@@ -108,6 +108,6 @@ def upload_image(request):
 def comment(request):
     if request.method == 'GET':
         nid = request.GET.get('nid',None)
-        content_item = models.Comment.objects.filter(nid=nid).all()
+        content_item = models.Comment.objects.filter(nid=nid).values('content')
         print(content_item)
         return HttpResponse(content_item)
