@@ -109,5 +109,5 @@ def comment(request):
     if request.method == 'GET':
         nid = request.GET.get('nid',None)
         content_item = models.Comment.objects.filter(nid=nid).values('content')
-        print(content_item)
+        print(type(content_item))
         return HttpResponse(content_item)
