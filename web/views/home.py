@@ -106,8 +106,28 @@ def upload_image(request):
 
 
 def comment(request):
+    status_dict={'status':False,'data':None}
     if request.method == 'GET':
         nid = request.GET.get('nid',None)
-        content_item = models.Comment.objects.filter(nid=nid).values('content')
-        print(type(content_item))
-        return HttpResponse(content_item)
+        content_item = models.Comment.objects.filter(news_id=nid).values_list('nid','content','user_info__username')[0]
+        print(content_item)
+        # return HttpResponse(json.dumps(str(content_item)))
+        return HttpResponse(json.dumps(content_item))
+
+    else:
+        conten_info = {}
+        conten_info['content'] = request.POST.get('content',None)
+        conten_info['reply_id'] = request.POST.get('reply_id',None)
+        conten_info['news_id'] = request.POST.get('news_id',None)
+        conten_info['ctime'] = datetime.datetime.now()
+        print(conten_info)
+        models.Comment.objects.create(up=1,down=1,ctime=conten_info['ctime'],device='pc',content=conten_info['content'],
+                                      news_id=conten_info['news_id'],user_info_id=2
+                                      )
+
+        status_dict['data'] = models.Comment.objects.values('nid','user_info__username',
+                                                            'content','reply_id_id',
+                                                            'news_id').order_by('-nid')[0]
+        status_dict['status'] = True
+        print(status_dict['data'])
+        return HttpResponse(json.dumps(status_dict))

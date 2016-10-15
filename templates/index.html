@@ -97,7 +97,9 @@
                                             </div>
 
                                             <ul id="comment_list_{{item.0}}" class="filetree comment-list-top-2 treeview hide">
-                                                {{ content_item.content }}
+{#                                                {% for i in content_item %}#}
+{#                                                <span>{{ i.0 }}</span>#}
+{#                                                {% endfor %}#}
 
                                             </ul>
 
@@ -589,9 +591,17 @@
                     url: '/comment',
                     type: 'GET',
                     data: {nid: nid},
+                    dataType: 'JSON',
                     success: function(arg){
                         $comment_list.empty();
-                        $comment_list.append(arg);
+                        show_content=arg[2] +' '+arg[1];
+                        $comment_list.append(show_content);
+{#                        var arg1 = JSON.stringify(arg);#}
+{#                        console.log(arg1);#}
+{#                        show_content=arg1 +' '+arg1[0][1];#}
+{#                        console.log(show_content);#}
+{#                        $comment_list.append(str(show_content));#}
+
                         var $loading = $comment_area.find('.comment-box').children().first();
                         $loading.addClass('hide');
                         $loading.siblings().removeClass('hide');
@@ -615,12 +625,20 @@
         function DoComment(nid){
             var content = $("#comment_content_"+nid).val();
             var reply_id = $("#reply_id_"+nid).attr('target');
+            if(reply_id){
+                var reply_id1 = reply_id;
+            }else {
+                reply_id1 = 1;
+            }
+            console.log(content);
+            console.log(reply_id1);
+            console.log(nid);
 
             if($('#action_nav').attr('is-login') == 'true'){
                 $.ajax({
-                    url: '/comment',
+                    url: '/comment/',
                     type: 'POST',
-                    data: {content: content, reply_id:reply_id, news_id: nid},
+                    data: {content: content, reply_id:reply_id1, news_id: nid},
                     dataType: 'json',
                     success: function(arg){
                         // 获取评论信息，将内容添加到指定位置
@@ -630,18 +648,18 @@
                             var a = '<ul><li class="items" style="padding:8px 0 0 16px;"><span class="folder" id="comment_folder_';
                             var b = arg.data.nid;
                             var c = '"><div class="comment-L comment-L-top"><a href="#" class="icons zhan-ico"></a><a href="/user/moyujian/submitted/1"><img src="/statics/images/1.jpg"></a></div><div class="comment-R comment-R-top" style="background-color: rgb(246, 246, 246);"><div class="pp"><a class="name" href="/user/moyujian/submitted/1">';
-                            var d = arg.data.username;
+                            var d = arg.data.user_info__username;
                             var e = '</a><span class="p3">';
                             var f = arg.data.content;
                             var g= '</span><span class="into-time into-time-top">';
                             var h = arg.data.ctime;
                             var i = '</span></div><div class="comment-line-top"><div class="comment-state"><a class="ding" href="javascript:void(0);"><b>顶</b><span class="ding-num">[0]</span></a><a class="cai" href="javascript:void(0);"><b>踩</b><span class="cai-num">[0]</span></a><span class="line-huifu">|</span> <a class="see-a jubao" href="javascript:void(0);">举报</a> <span class="line-huifu">|</span> <a class="see-a huifu-a" href="javascript:void(0);" onclick="';
-                            var j = "reply(" + arg.data.news_id + "," +arg.data.nid+",'"+arg.data.username+"')";
+                            var j = "reply(" + arg.data.news_id + "," +arg.data.nid+",'"+arg.data.user_info__username+"')";
                             var k = '">回复</a></div></div></div></span></li></ul>';
                             var tag = a+b+c+d+e+f+g+h+i+j+k;
                             console.log(arg,tag);
-                            if(arg.data.reply_id){
-                                $comment_folder = $('#comment_folder_' + arg.data.reply_id);
+                            if(arg.data.reply_id_id){
+                                $comment_folder = $('#comment_folder_' + arg.data.reply_id_id);
                                 $comment_folder.after(tag);
                             }else{
                                 $('#comment_list_'+arg.data.news_id).append(tag);
